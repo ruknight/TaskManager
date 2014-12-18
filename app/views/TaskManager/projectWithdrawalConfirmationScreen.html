@@ -1,0 +1,18 @@
+#{extends 'main.html' /}
+#set title:'タスク管理システム | プロジェクト脱退確認画面' /}
+
+<h1>プロジェクト脱退確認画面</h1>
+
+<p>プロジェクト「${project_name}」から本当に脱退しますか？</p>
+
+<div id="プロジェクト脱退確定フォーム" style="text-align: center;">
+	<form action='/TaskManager/projectWithdrawal' method="post">
+		<input type="hidden" name="project_name" value="${project_name}" />
+		<input type="submit" value="脱退" />
+		<a href="/TaskManager/taskListScreen?project_name=${project_name}">
+			<button type="button">
+				キャンセル
+			</button>
+		</a>
+	</form>
+</div>

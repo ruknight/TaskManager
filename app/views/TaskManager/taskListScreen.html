@@ -1,0 +1,136 @@
+#{extends 'main.html' /} #{set title:'タスク管理システム｜タスク一覧' /}
+<div id="remove_modal" class="modal fade" >
+  <div class="modal-dialog" style="margin-top:8%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">本当にタスクを削除しますか？</h4>
+      </div>
+      <div class="modal-footer">
+      <form action='/TaskManager/taskDelete' method='POST'>
+      	<div id="remove_form">
+      	<input type='hidden' name='project_name' value='${project_name}' />
+      	</div>
+        <input type="submit" class="btn btn-default" value="はい">
+        <input type="button" class="btn btn-default" data-dismiss="modal" value="いいえ">
+        </form>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div id="edit_modal" class="modal fade" >
+  <div class="modal-dialog" style="margin-top:8%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">タスクの編集</h4>
+      </div>
+      <form action='/TaskManager/taskEdit' method='POST'>
+      <div id="edit_form" class="modal-body">
+        <input type='hidden' name='project_name' value='${project_name}' /> 
+		<input type='text' name='task_name' value='' placeholder="タスク名" />
+		<input type="text" class="datepicker" name="deadline" placeholder="締め切り" />
+      </div>
+      <div class="modal-footer">
+        <input type="button" class="btn btn-default" data-dismiss="modal" value="閉じる">
+        <input type="submit" class="btn btn-primary" value="編集">
+      </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<a href="/TaskManager/projectListScreen"><button type="button">◀タスク一覧画面に戻る</button></a>
+<a href="/TaskManager/projectWithdrawalConfirmationScreen?project_name=${project_name}" style="float: right"><button type="button">プロジェクト脱退</button></a>
+
+<h1>${project_name}のタスク一覧</h1>
+<table >
+	<thead style="margin: 5%">
+		<tr>
+			<th>No</th>
+			<th>タスク名</th>
+			<th>担当者（作成者）</th>
+			<th>締め切り</th>
+			<th>タグ</th>
+			<th>タスクの編集・削除</th>
+			<th>タスクの状況</th>
+		</tr>
+	</thead>
+	<tbody style="margin: 10%">
+		<tr>
+			<div id="タスク作成フォーム" style="text-align: center;">
+				<form action='/TaskManager/taskCreate' method='POST'> 
+					<td><input type='hidden' name='project_name' value='${project_name}' /> </td>
+					<td><input type='text' name='task_name' value='' placeholder="タスク名" /></td>
+					<td></td>
+					<td><input type="text" class="datepicker" name="deadline" placeholder="締め切り" /></td>
+					<td></td>
+					<td><input type="submit" value="タスク作成" /></td>
+					<td></td>
+				</form>
+			</div>
+		</tr>
+		#{list items:タスク一覧, as:'task'}
+		<tr>
+			<td>${task.id}</td>
+			<td>${task.task_name}</td>
+			<td>${task.assign_user.user_id}</td>
+			<td>${task.deadline == null ? "-" : task.deadline.format('yyyy/MM/dd')}</td>
+			<td>
+			#{if user.my_tasks.contains(task)}
+				<a href="/TaskManager/addTag?id_of_task=${task.id}&project_name=${project_name}"><button type="button" class="btn btn-default">タグ付けする</button></a>
+			#{/if}
+			</td>
+			<td>
+			#{if user.my_tasks.contains(task)}
+				<button type="button" class="edit btn btn-default">編集する</button>
+				<button type="button" class="remove btn btn-default">削除する</button>
+			#{/if}
+			</td>
+			<td>
+			#{if task.is_done == true} 
+				完了 
+			#{/if} #{else}
+			 	未完了
+			 	 #{if user.my_tasks.contains(task)} 
+					<a href="/TaskManager/taskComplete?id_of_task=${task.id}&project_name=${project_name}">
+						<button class="btn btn-default" type="button">完了する</button>
+					</a>
+				　#{/if}
+			#{/else}
+			</td>
+		</tr>
+		#{/list}
+	</tbody>
+</table>
+
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+<link type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/ui-lightness/jquery-ui.css" rel="stylesheet" />
+
+<script type="text/javascript">
+$(function(){
+	$(".datepicker").datepicker(
+		$.datepicker.regional["ja"]		//日本語設定
+	);
+	$(".datepicker").datepicker("option", "dateFormat", 'yy-mm-dd');
+	
+	$(".remove").on("click", function(){
+		var task_id = $(this).parent().parent().find("td:first").text();
+		console.log(task_id);
+		$("#remove_form").append("<input type='hidden' name='id_of_task' value='" + task_id + "' /> ");
+		$("#remove_modal").modal('show')
+	});
+	$(".edit").on("click", function(){
+		var task_id = $(this).parent().parent().find("td:first").text();
+		console.log(task_id);
+		$("#edit_form").append("<input type='hidden' name='id_of_task' value='" + task_id + "' /> ");
+		$("#edit_modal").modal('show')
+	});
+});
+</script>
+
+

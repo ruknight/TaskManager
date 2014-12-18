@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>#{get 'title' /}</title>
+        <meta charset="utf-8">
+        <link href="@{'/public/stylesheets/bootstrap.min.css'}" rel="stylesheet">
+        #{get 'moreStyles' /}
+        <link rel="stylesheet" media="screen" href="@{'/public/stylesheets/main.css'}">
+        #{get 'moreStyles' /}
+
+        <script src="@{'/public/javascripts/jquery-1.11.1.min.js'}" type="text/javascript" charset="utf-8"></script>
+        #{get 'moreScripts' /}
+        <script src="@{'/public/javascripts/bootstrap.min.js'}"></script>
+        #{get 'moreScripts' /}
+    </head>
+    <body>
+        <div id="header" style="height:40px; border-bottom : 3px solid #CCC;">
+            <div id="logo" style="float:left"><img src="@{'/public/images/logo.png'}" alt='TaskManager' height='38'></div>
+            <div id="logout" style="float:right">
+                ${controllers.Auth.get_login_user().user_id} | 
+                <a href="/secure/logout">LOGOUT</a>
+            </div>
+        </div>
+        #{if flash.success}
+        <div class="alert alert-success">
+            <strong>Success!</strong> &{flash.success}
+        </div>
+        #{/if}
+        #{if flash.error}
+        <div class="alert alert-error">
+            <strong>Error!</strong> &{flash.error}
+        </div>
+        #{/if}
+        #{doLayout /}
+        
+        <script>
+            $(document).ready(function(){
+                
+                // ５秒後に成功・失敗メッセージを消す
+                $(".alert").delay(5000).slideUp(1000);
+            });
+        </script>
+    </body>
+</html>

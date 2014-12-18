@@ -1,0 +1,72 @@
+#{extends 'main.html' /}
+#{set title:'タスク管理システム｜管理者用TOP画面' /}
+
+<h1>ユーザー一覧</h1>
+<table>
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>ユーザーID</th>
+            <th>管理者フラグ</th>
+            <th>削除フラグ</th>
+        </tr>
+    </thead>
+    <tbody>
+        #{list items:ユーザー一覧, as:'user'}
+        <tr>
+            <td>${user.id}</td>
+            <td>${user.user_id}</td>
+            <td>${user.is_admin}</td>
+            <td>${user.is_delete}</td>
+        </tr>
+        #{/list}
+    </tbody>
+</table>
+
+<div id="利用者登録フォーム" style="text-align:center;">
+    <form action='/Admin/利用者登録処理' method='POST'>
+        <input type='text' name='user_id' value='' placeholder="ユーザーID" />
+        <input type='password' name='password' value='' placeholder="パスワード" />
+        <input type="submit" value="利用者登録" />
+    </form>
+</div>
+
+<h1>プロジェクト一覧</h1>
+<table>
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>プロジェクト名</th>
+            <th>登録されているタスク数</th>
+            <th>参加している利用者数</th>
+            <!-- 空の見出し この列に削除ボタンを配置する -->
+            <th></th>
+
+        </tr>
+    </thead>
+    <tbody>
+        #{list items:プロジェクト一覧, as:'project'}
+        <tr>
+            <td>${project.id}</td>
+            <td>${project.project_name}
+            </td>
+            <td>${project.task_list.size()}</td>
+            <td>${project.project_member.size()}
+            </td>
+            <td>
+                <a href="/Admin/プロジェクト削除処理?project_name=${project.project_name}">
+                    <button type="button">削除</button>
+                </a>
+
+            </td>
+        </tr>
+        #{/list}
+    </tbody>
+</table>
+
+<div id="プロジェクト作成フォーム" style="text-align:center;">
+    <form action='/Admin/プロジェクト作成処理' method='POST'>
+        <input type='text' name='project_name' value='' placeholder="プロジェクト名" size="40" />
+        <input type="submit" value="プロジェクト作成" />
+    </form>
+</div>

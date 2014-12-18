@@ -1,0 +1,46 @@
+#{extends 'main.html' /}
+#{set title:'タスク管理システム｜プロジェクト一覧' /}
+
+<h1>プロジェクト一覧</h1>
+<table>
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>プロジェクト名</th>
+            <th>全タスク数</th>
+            <th>参加利用者数</th>
+            <th>参加状況</th>
+            <th>担当タスクの完了率</th>
+        </tr>
+    </thead>
+    <tbody>
+        #{list items:project_list, as:'project'}
+        <tr>
+            <td>${project.id}</td>
+            <td>${project.project_name}</td>
+            <td>${project.task_list.size()}</td>
+            <td>${project.project_member.size()}</td>
+            <td>
+                #{if user.my_projects.contains(project)}
+                参加中 <a href="/TaskManager/taskListScreen?project_name=${project.project_name}"><button type="button">タスク一覧画面</button></a>
+                #{/if}
+                #{else}
+                未参加 <a href="/TaskManager/taskListScreen?project_name=${project.project_name}"><button type="button">プロジェクトに参加する</button></a>
+                #{/else}
+            </td>
+            <td style="width:300px">
+                #{if user.my_projects.contains(project)}
+                <img class="bar" style="display:none;" src="@{'/public/images/bar.png'}" alt="完了率" height="15px" width="${user.タスク完了率(project) * 2}">
+                ${user.タスク完了率(project)}% (${user.担当の完了タスク数(project)} / ${user.担当タスク数(project)})
+                #{/if}
+            </td>
+        </tr>
+        #{/list}
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function() {
+        $(".bar").animate( { width: 'show' }, '1000' );
+    });
+</script>
