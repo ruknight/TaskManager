@@ -26,11 +26,12 @@
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
         <h4 class="modal-title">タスクの編集</h4>
       </div>
-      <form action='/TaskManager/taskEdit' method='POST'>
+      <form id="edit_task" action='/TaskManager/taskEdit' method='POST'>
 	      <div id="edit_form" class="modal-body">
 	        <input type='hidden' name='project_name' value='${project_name}' /> 
-			<input type='text' name='task_name' value='' placeholder="タスク名" />
+			<input id="edit_task_name" type='text' name='task_name' value='' placeholder="タスク名" />
 			<input type="text" class="datepicker" name="deadline" placeholder="締め切り" />
+			<p id="edit_validation" class="hide warning">タスク名を入力してください</p>      
 	      </div>
 	      <div class="modal-footer">
 	        <input type="button" class="btn btn-default" data-dismiss="modal" value="閉じる">
@@ -60,9 +61,9 @@
 	<tbody style="margin: 10%">
 		<tr>
 			<div id="タスク作成フォーム" style="text-align: center;">
-				<form id="create_task" action='/TaskManager/taskCreate' method='POST'> 
+				<form action='/TaskManager/taskCreate' method='POST'> 
 					<td><input type='hidden' name='project_name' value='${project_name}' /> </td>
-					<td><input type='text' id="create_task_name" name='task_name' value='' placeholder="タスク名" /></td>
+					<td><input type='text' name='task_name' value='' placeholder="タスク名" /></td>
 					<td></td>
 					<td><input type="text" class="datepicker" name="deadline" placeholder="締め切り" /></td>
 					<td></td>
@@ -130,6 +131,14 @@ $(function(){
 		$("#edit_form").append("<input type='hidden' name='id_of_task' value='" + task_id + "' /> ");
 		$("#edit_modal").modal('show')
 	});
+});
+$("#edit_task").submit(function(){
+	var task = $("#edit_task_name").val();
+	console.log(task);
+	if(task == ""){
+		$("#edit_validation").removeClass("hide");
+		return false;
+	}
 });
 </script>
 
