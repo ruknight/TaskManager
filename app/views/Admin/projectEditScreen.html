@@ -1,13 +1,32 @@
 #{extends 'main.html' /}
 #{set title:'タスク管理システム｜プロジェクト編集画面' /}
 
+<div id="user_remove_modal" class="modal fade" >
+    <div class="modal-dialog" style="margin-top:8%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">本当に削除しますか？</h4>
+            </div>
+            <div class="modal-footer">
+                #{list items:userList, as:'user'}
+                <form action='/Admin/userDelete?project_name=${project.project_name}&user_id=${user.user_id}' method='POST'>
+                    #{/list}
+                    <input type="submit" class="btn btn-default" value="はい">
+                    <input type="button" class="btn btn-default" data-dismiss="modal" value="いいえ">
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <a href="/Admin/adminScreen"><button type="button">◀top画面に戻る</button></a>
 
 <h1>プロジェクト編集</h1>
 <table>
     <thead>
         <tr>
-            <th>ユーザID</th>
+            <th>参加中の利用者</th>
             <!-- 空の見出し この列に削除ボタンを配置する -->
             <th></th>
         </tr>
@@ -18,9 +37,7 @@
         <tr>
             <td>${user.user_id}</td>
             <td>
-                <a href="/Admin/userDelete?project_name=${project.project_name}&user_id=${user.user_id}">
-                    <button type="button">削除</button>
-                </a>
+                <button type="button" class="user_remove btn btn-default">削除</button>
             </td>
         </tr>
         #{/list}
@@ -77,3 +94,11 @@
 </div>
 
 -->
+
+<script type="text/javascript">
+    $(function() {
+        $(".user_remove").on("click", function() {
+            $("#user_remove_modal").modal('show')
+        });
+    });
+</script>
