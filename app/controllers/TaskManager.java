@@ -215,7 +215,7 @@ public class TaskManager extends Controller {
 		UserInformation user = Auth.get_login_user();
 		// タスク情報を取得
 		TaskInformation task = TaskInformation.findById(id_of_task);
-		TagInformation tag = TagInformation.find("byTask", task).first();
+		List<TagInformation> tag_list = TagInformation.find("byTask", task).fetch();
 		
 
 		if (task == null) {
@@ -234,10 +234,11 @@ public class TaskManager extends Controller {
 			user.save();
 			
 			//タスクに含まれているタグを削除
-			task.my_tag.remove(tag);
-			task.save();
-			
-			tag.delete();
+			for(int i=0; i<tag_list.size(); i++){
+				task.my_tag.remove(tag_list.get(i));
+				task.save();
+				tag_list.get(i).delete();
+			}
 			
 			task.delete();
 

@@ -106,8 +106,9 @@
 				<button class="tag" type="button" class="btn btn-default">タグ付けする</button>
 			#{/if} #{else}
 			#{list items:task.my_tag, as:"tag"}
-			${tag.tag_name}
-			#{/list}
+			${tag.tag_name},
+			#{/list}<br />
+			<button class="tag" type="button" class="btn btn-default">タグ付けする</button>
 			#{/else}
 			</td>
 			<td>
