@@ -62,3 +62,9 @@ td:hover {
     background-color : #DDD;
 }
 
+.hide {
+	visibility : hidden;
+}
+.warning {
+	color: red;
+}

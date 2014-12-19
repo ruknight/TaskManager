@@ -27,15 +27,15 @@
         <h4 class="modal-title">タスクの編集</h4>
       </div>
       <form action='/TaskManager/taskEdit' method='POST'>
-      <div id="edit_form" class="modal-body">
-        <input type='hidden' name='project_name' value='${project_name}' /> 
-		<input type='text' name='task_name' value='' placeholder="タスク名" />
-		<input type="text" class="datepicker" name="deadline" placeholder="締め切り" />
-      </div>
-      <div class="modal-footer">
-        <input type="button" class="btn btn-default" data-dismiss="modal" value="閉じる">
-        <input type="submit" class="btn btn-primary" value="編集">
-      </div>
+	      <div id="edit_form" class="modal-body">
+	        <input type='hidden' name='project_name' value='${project_name}' /> 
+			<input type='text' name='task_name' value='' placeholder="タスク名" />
+			<input type="text" class="datepicker" name="deadline" placeholder="締め切り" />
+	      </div>
+	      <div class="modal-footer">
+	        <input type="button" class="btn btn-default" data-dismiss="modal" value="閉じる">
+	        <input type="submit" class="btn btn-primary" value="編集">
+	      </div>
       </form>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -60,9 +60,9 @@
 	<tbody style="margin: 10%">
 		<tr>
 			<div id="タスク作成フォーム" style="text-align: center;">
-				<form action='/TaskManager/taskCreate' method='POST'> 
+				<form id="create_task" action='/TaskManager/taskCreate' method='POST'> 
 					<td><input type='hidden' name='project_name' value='${project_name}' /> </td>
-					<td><input type='text' name='task_name' value='' placeholder="タスク名" /></td>
+					<td><input type='text' id="create_task_name" name='task_name' value='' placeholder="タスク名" /></td>
 					<td></td>
 					<td><input type="text" class="datepicker" name="deadline" placeholder="締め切り" /></td>
 					<td></td>

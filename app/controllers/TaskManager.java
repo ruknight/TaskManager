@@ -3,6 +3,7 @@ package controllers;
 import play.*;
 import play.mvc.*;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import models.*;
@@ -87,7 +88,8 @@ public class TaskManager extends Controller {
 	 */
 	public static void taskListScreen(String project_name) {
 		// プロジェクト情報を取得
-		ProjectInformation project = ProjectInformation.find("byProject_name", project_name).first();
+		ProjectInformation project = ProjectInformation.find("byProject_name",
+				project_name).first();
 		if (project == null) { // プロジェクトが存在しなかったら一覧画面に戻す
 			flash.put("error", "プロジェクトは存在しません");
 			projectListScreen();
@@ -103,7 +105,8 @@ public class TaskManager extends Controller {
 				project.save();
 			}
 
-			List<TaskInformation> タスク一覧 = TaskInformation.find("byProject", project).fetch();
+			List<TaskInformation> タスク一覧 = TaskInformation.find("byProject",
+					project).fetch();
 
 			render(project_name, タスク一覧, user);
 		}
@@ -121,28 +124,52 @@ public class TaskManager extends Controller {
 	public static void taskCreate(String project_name, String task_name,
 			Date deadline) {
 		// プロジェクト情報を取得
-		ProjectInformation project = ProjectInformation.find("byProject_name", project_name).first();
+		ProjectInformation project = ProjectInformation.find("byProject_name",
+				project_name).first();
 
 		// ユーザー情報を取得
 		UserInformation user = Auth.get_login_user();
+		
+		//タスクがあることと日付が正しいかを確認する変数
+		boolean is_task = true;
+		boolean correct_deadline = true;
+		
+		//タスクがあるかどうか調べる
+		if (task_name.length() == 0) {
+			is_task = false;
+		}
+		
+		// 現在の時刻と渡された時刻を比べる
+		Date date = new Date();
+		if (deadline != null && date.getTime() > deadline.getTime()) {
+			correct_deadline = false;
+		}
+		
+		//正しい入力がされていたらタスクを追加する
+		if (is_task == true && correct_deadline == true) {
+			// タスク作成
+			TaskInformation task = new TaskInformation(project, user,
+					task_name, deadline);
+			task.save();
 
-		// タスク作成
-		TaskInformation task = new TaskInformation(project, user, task_name, deadline);
-		task.save();
+			// ユーザー情報に担当タスクを追加
+			user.my_tasks.add(task);
+			user.save();
 
-		// ユーザー情報に担当タスクを追加
-		user.my_tasks.add(task);
-		user.save();
+			// プロジェクト情報にタスクを追加
+			project.task_list.add(task);
+			task.save();
 
-		// プロジェクト情報にタスクを追加
-		project.task_list.add(task);
-		task.save();
+			flash.put("success", "タスク[" + task_name + "]を作成しました");
 
-		flash.put("success", "タスク[" + task_name + "]を作成しました");
+			taskListScreen(project_name);
+		}else{
+			flash.put("error", "タスク名または締め切りを正しく入力してください");
+			taskListScreen(project_name);
+		}
 
-		taskListScreen(project_name);
 	}
-	
+
 	/**
 	 * タスク編集処理<br />
 	 * 同じタスクを別の人も登録するかもしれないので，重複チェックはしない
@@ -152,7 +179,8 @@ public class TaskManager extends Controller {
 	 * @param task_name
 	 *            タスク名
 	 */
-	public static void taskEdit(String project_name,String task_name, Date deadline, Long id_of_task) {
+	public static void taskEdit(String project_name, String task_name,
+			Date deadline, Long id_of_task) {
 		TaskInformation task = TaskInformation.findById(id_of_task);
 
 		if (task == null) {
@@ -166,11 +194,13 @@ public class TaskManager extends Controller {
 			task.deadline = deadline;
 			task.save();
 
-			flash.put("success", "タスク[" + previous_task + "]をタスク[" + task.task_name + "]に編集しました");
+			flash.put("success", "タスク[" + previous_task + "]をタスク["
+					+ task.task_name + "]に編集しました");
 
 			taskListScreen(project_name);
 		}
 	}
+
 	/**
 	 * 選択したタスクを削除状態にする<br />
 	 * タスク名だと重複している可能性があるので，Taskテーブルのidを使う
@@ -179,11 +209,12 @@ public class TaskManager extends Controller {
 	 * @param id_of_task
 	 */
 	public static void taskDelete(String project_name, Long id_of_task) {
-		//プロジェクト情報を取得
-		ProjectInformation project = ProjectInformation.find("byProject_name", project_name).first();
-		//ユーザ情報を取得
+		// プロジェクト情報を取得
+		ProjectInformation project = ProjectInformation.find("byProject_name",
+				project_name).first();
+		// ユーザ情報を取得
 		UserInformation user = Auth.get_login_user();
-		//タスク情報を取得
+		// タスク情報を取得
 		TaskInformation task = TaskInformation.findById(id_of_task);
 
 		if (task == null) {
@@ -193,22 +224,22 @@ public class TaskManager extends Controller {
 		} else {
 			// タスクを削除する
 			String previous_task = task.task_name;
-			//プロジェクトの参加メンバーから削除
+			// プロジェクトの参加メンバーから削除
 			project.task_list.remove(task);
 			project.save();
-			
-			//ユーザの参加プロジェクトから削除
+
+			// ユーザの参加プロジェクトから削除
 			user.my_tasks.remove(task);
 			user.save();
-			
+
 			task.delete();
-			
+
 			flash.put("success", "タスク[" + previous_task + "]を削除しました");
 
 			taskListScreen(project_name);
 		}
 	}
-	
+
 	/**
 	 * 選択したタスクを完了状態にする<br />
 	 * タスク名だと重複している可能性があるので，Taskテーブルのidを使う
@@ -237,47 +268,55 @@ public class TaskManager extends Controller {
 	/**
 	 * プロジェクト脱退の確認画面を表示する. <br />
 	 * 担当していて未完了のタスクがある場合は、タスク一覧画面に戻す
-	 * @param project_name プロジェクト名 
+	 * 
+	 * @param project_name
+	 *            プロジェクト名
 	 */
-	public static void projectWithdrawalConfirmationScreen(String project_name){
-		//プロジェクト情報を取得
-		ProjectInformation project = ProjectInformation.find("byProject_name", project_name).first();
-		//ユーザ情報を取得
+	public static void projectWithdrawalConfirmationScreen(String project_name) {
+		// プロジェクト情報を取得
+		ProjectInformation project = ProjectInformation.find("byProject_name",
+				project_name).first();
+		// ユーザ情報を取得
 		UserInformation user = Auth.get_login_user();
-		
-		//担当していて未完了のタスクを検索
-		List<TaskInformation> task_list = TaskInformation.find("byProjectAndAssign_userAndIs_done", project, user, false).fetch();
-		
-		if(!task_list.isEmpty()){
+
+		// 担当していて未完了のタスクを検索
+		List<TaskInformation> task_list = TaskInformation.find(
+				"byProjectAndAssign_userAndIs_done", project, user, false)
+				.fetch();
+
+		if (!task_list.isEmpty()) {
 			flash.put("error", "完了していないタスクがあります");
 			taskListScreen(project_name);
-		}else{
+		} else {
 			render(project_name);
 		}
 	}
- 	
+
 	/**
 	 * プロジェクトから脱退する
-	 * @param project_name プロジェクト名
+	 * 
+	 * @param project_name
+	 *            プロジェクト名
 	 */
-	public static void projectWithdrawal(String project_name){
-		//プロジェクト情報を取得
-		ProjectInformation project = ProjectInformation.find("byProject_name", project_name).first();
-		
-		//ユーザ情報を取得
+	public static void projectWithdrawal(String project_name) {
+		// プロジェクト情報を取得
+		ProjectInformation project = ProjectInformation.find("byProject_name",
+				project_name).first();
+
+		// ユーザ情報を取得
 		UserInformation user = Auth.get_login_user();
-		
-		//プロジェクトの参加メンバーから削除
+
+		// プロジェクトの参加メンバーから削除
 		project.project_member.remove(user);
 		project.save();
-		
-		//ユーザの参加プロジェクトから削除
+
+		// ユーザの参加プロジェクトから削除
 		user.my_projects.remove(project);
 		user.save();
-		
+
 		flash.put("success", "プロジェクト「" + project_name + "」から脱退しました");
-		
+
 		projectListScreen();
-		
+
 	}
 }
