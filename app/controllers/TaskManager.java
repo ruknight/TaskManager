@@ -104,11 +104,10 @@ public class TaskManager extends Controller {
 				project.project_member.add(user);
 				project.save();
 			}
-
-			List<TaskInformation> タスク一覧 = TaskInformation.find("byProject",
+			List<TaskInformation> task_list = TaskInformation.find("byProject",
 					project).fetch();
 
-			render(project_name, タスク一覧, user);
+			render(project_name, task_list, user);
 		}
 	}
 
@@ -216,6 +215,8 @@ public class TaskManager extends Controller {
 		UserInformation user = Auth.get_login_user();
 		// タスク情報を取得
 		TaskInformation task = TaskInformation.findById(id_of_task);
+		TagInformation tag = TagInformation.find("byTask", task).first();
+		
 
 		if (task == null) {
 			// タスク情報が取得できない場合はid_of_taskがおかしいので，タスク一覧画面に戻す
@@ -227,13 +228,20 @@ public class TaskManager extends Controller {
 			// プロジェクトの参加メンバーから削除
 			project.task_list.remove(task);
 			project.save();
-
+			
 			// ユーザの参加プロジェクトから削除
 			user.my_tasks.remove(task);
 			user.save();
-
+			
+			//タスクに含まれているタグを削除
+			task.my_tag.remove(tag);
+			task.save();
+			
+			tag.delete();
+			
 			task.delete();
 
+			
 			flash.put("success", "タスク[" + previous_task + "]を削除しました");
 
 			taskListScreen(project_name);
@@ -263,6 +271,34 @@ public class TaskManager extends Controller {
 
 			taskListScreen(project_name);
 		}
+	}
+	/**
+	 * タグ作成処理<br />
+	 * 
+	 * @param project_name
+	 * 			  プロジェクト名
+	 * @param id_of_task
+	 *            タスクのid
+	 * @param tag_name
+	 *            タグ名
+	 */
+	public static void tagCreate(String project_name,Long id_of_task, String tag_name) {
+		
+		// タスク情報を取得
+		TaskInformation task = TaskInformation.findById(id_of_task);
+
+			// タグ作成
+			TagInformation tag = new TagInformation(task, tag_name);
+			tag.save();
+
+			// タスク情報にタグを追加
+			task.my_tag.add(tag);
+			task.save();
+
+			flash.put("success", "タグ[" + tag_name + "]を追加しました");
+
+			taskListScreen(project_name);
+
 	}
 
 	/**

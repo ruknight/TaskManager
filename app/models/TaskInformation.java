@@ -5,8 +5,9 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-
+import javax.persistence.OneToMany;
 
 import play.db.jpa.Model;
 
@@ -40,6 +41,7 @@ public class TaskInformation extends Model {
 	 * 完了フラグ．falseなら未完了，trueなら完了
 	 */
 	public Boolean is_done = false;
+	
 	/**
 	 * 締め切り
 	 */
@@ -48,7 +50,8 @@ public class TaskInformation extends Model {
 	/**
 	 * タスクが持つタグ
 	 */
-	//public List<Tag> my_tag = new ArrayList<Tag>();
+	@OneToMany
+	public List<TagInformation> my_tag = new ArrayList<TagInformation>();
 
 	
 	/**

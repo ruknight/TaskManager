@@ -42,6 +42,29 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<div id="tag_modal" class="modal fade" >
+  <div class="modal-dialog" style="margin-top:8%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">タグの追加</h4>
+      </div>
+      <form id="create_tag" action='/TaskManager/tagCreate' method='POST'>
+	      <div class="modal-body">
+	        <input type='hidden' name='project_name' value='${project_name}' /> 
+	        <div id="add_task_id"></div>
+			<input type="text" class="tag" name="tag_name" placeholder="タグ名" />
+			<p id="tag_validation" class="hide warning">タグ名を入力してください</p>      
+	      </div>
+	      <div class="modal-footer">
+	        <input type="button" class="btn btn-default" data-dismiss="modal" value="閉じる">
+	        <input type="submit" class="btn btn-primary" value="追加">
+	      </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <a href="/TaskManager/projectListScreen"><button type="button">◀タスク一覧画面に戻る</button></a>
 <a href="/TaskManager/projectWithdrawalConfirmationScreen?project_name=${project_name}" style="float: right"><button type="button">プロジェクト脱退</button></a>
 
@@ -72,16 +95,20 @@
 				</form>
 			</div>
 		</tr>
-		#{list items:タスク一覧, as:'task'}
+		#{list items:task_list, as:'task'}
 		<tr>
 			<td>${task.id}</td>
 			<td>${task.task_name}</td>
 			<td>${task.assign_user.user_id}</td>
 			<td>${task.deadline == null ? "-" : task.deadline.format('yyyy/MM/dd')}</td>
 			<td>
-			#{if user.my_tasks.contains(task)}
-				<a href="/TaskManager/addTag?id_of_task=${task.id}&project_name=${project_name}"><button type="button" class="btn btn-default">タグ付けする</button></a>
-			#{/if}
+			#{if task.my_tag.size() == 0}
+				<button class="tag" type="button" class="btn btn-default">タグ付けする</button>
+			#{/if} #{else}
+			#{list items:task.my_tag, as:"tag"}
+			${tag.tag_name}
+			#{/list}
+			#{/else}
 			</td>
 			<td>
 			#{if user.my_tasks.contains(task)}
@@ -137,6 +164,20 @@ $("#edit_task").submit(function(){
 	console.log(task);
 	if(task == ""){
 		$("#edit_validation").removeClass("hide");
+		return false;
+	}
+});
+$(".tag").on("click", function(){
+	var task_id = $(this).parent().parent().find("td:first").text();
+	console.log(task_id);
+	$("#add_task_id").append("<input type='hidden' name='id_of_task' value='" + task_id + "' /> ");
+	$("#tag_modal").modal('show')
+});
+$("#create_tag").submit(function(){
+	var task = $(".tag").val();
+	console.log(task);
+	if(task == ""){
+		$("#tag_validation").removeClass("hide");
 		return false;
 	}
 });
