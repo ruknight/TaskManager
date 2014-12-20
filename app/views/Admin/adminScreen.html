@@ -9,12 +9,16 @@
                 <h4 class="modal-title">本当に削除しますか？</h4>
             </div>
             <div class="modal-footer">
-                #{list items:プロジェクト一覧, as:'project'}
-                <form action='/Admin/プロジェクト削除処理?project_name=${project.project_name}' method='POST'>
-                    #{/list}
+
+                <form action='/Admin/projectDelete' method='POST' id='oya'>
+                    <div id="project_remove_form">
+                    </div>
+
                     <input type="submit" class="btn btn-default" value="はい">
                     <input type="button" class="btn btn-default" data-dismiss="modal" value="いいえ">
+
                 </form>
+
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -43,7 +47,7 @@
 </table>
 
 <div id="利用者登録フォーム" style="text-align:center;">
-    <form action='/Admin/利用者登録処理' method='POST'>
+    <form action='/Admin/userRegistrate' method='POST'>
         <input type='text' name='user_id' value='' placeholder="ユーザーID" />
         <input type='password' name='password' value='' placeholder="パスワード" />
         <input type="submit" value="利用者登録" />
@@ -77,8 +81,6 @@
                     <button type="button" class="btn-default">編集</button>
                 </a>               
 
-
-
                 <button type="button" class="project_remove btn btn-default">削除</button>
 
             </td>
@@ -88,7 +90,7 @@
 </table>
 
 <div id="プロジェクト作成フォーム" style="text-align:center;">
-    <form action='/Admin/プロジェクト作成処理' method='POST'>
+    <form action='/Admin/projectCreate' method='POST'>
         <input type='text' name='project_name' value='' placeholder="プロジェクト名" size="40" />
         <input type="submit" value="プロジェクト作成" />
     </form>
@@ -100,8 +102,20 @@
 
 
 <script type="text/javascript">
+
     $(function() {
         $(".project_remove").on("click", function() {
+            var project_id = $(this).parent().parent().find("td:first").text();
+            console.log(project_id);
+
+
+            /**
+             * 先頭に追加
+             * 先頭じゃないと削除確認のモーダルで いいえ を押した後
+             * 更新等を挟まずに別のプロジェクトを削除しようとすると、最初に いいえ を押したプロジェクトが削除されてしまう
+             * 
+             */
+            $("#project_remove_form").prepend("<input type='hidden' name='project_id' value='" + project_id + "' /> ");
             $("#project_remove_modal").modal('show')
         });
     });

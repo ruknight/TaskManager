@@ -36,7 +36,7 @@ public class Admin extends Controller {
      * @param user_id ユーザーID
      * @param password パスワード
      */
-    public static void 利用者登録処理(String user_id, String password) {
+    public static void userRegistrate(String user_id, String password) {
 
         // 重複チェック
         UserInformation user = UserInformation.find("byUser_id", user_id).first();
@@ -60,7 +60,7 @@ public class Admin extends Controller {
      *
      * @param project_name プロジェクト名
      */
-    public static void プロジェクト作成処理(String project_name) {
+    public static void projectCreate(String project_name) {
         // 重複チェック
         ProjectInformation project = ProjectInformation.find("byProject_name", project_name).first();
         if (project != null) {
@@ -79,12 +79,12 @@ public class Admin extends Controller {
     /**
      * プロジェクト削除処理 プロジェクト削除前にプロジェクトのユーザ、タスクの情報も合わせて削除 処理後、管理者用TOP画面に戻す
      *
-     * @param project_name プロジェクト名
+     * @param project_id ID
      */
-    public static void プロジェクト削除処理(String project_name) {
+    public static void projectDelete(Long project_id) {
 
-        // プロジェクト情報取得
-        ProjectInformation project = ProjectInformation.find("byProject_name", project_name).first();
+        // プロジェクト情報取得        
+        ProjectInformation project = ProjectInformation.findById(project_id);
         // プロジェクトのタスク情報をリストで取得
         List<TaskInformation> taskList = TaskInformation.find("byProject", project).fetch();
         // プロジェクトに参加しているユーザ情報を userList に格納
@@ -130,7 +130,7 @@ public class Admin extends Controller {
         project.delete();
 
         // 削除処理後は管理者トップ画面に戻る
-        adminScreen();
+         adminScreen();
     }
 
     /**
@@ -192,7 +192,7 @@ public class Admin extends Controller {
         projectEditScreen(project_name);
     }
 
-    public static void userDelete(String project_name, String user_id) {
+    public static void userDelete(String user_id, String project_name) {
         // プロジェクト情報取得
         ProjectInformation project = ProjectInformation.find("byProject_name", project_name).first();
         // プロジェクトのタスク情報をリストで取得
@@ -201,7 +201,7 @@ public class Admin extends Controller {
         UserInformation user = UserInformation.find("byUser_id", user_id).first();
         // タグ情報取得
         List<TagInformation> tagList = TagInformation.findAll();
-
+        
         // 参加メンバ情報、タスク情報の削除
         project.project_member.remove(user);
         project.task_list.removeAll(user.my_tasks);
@@ -212,11 +212,9 @@ public class Admin extends Controller {
         user.my_projects.remove(project);
         user.my_tasks.removeAll(taskList);
         user.save();
-        
+
         /**
-         * 担当タスクのタグ情報削除
-         * TaskInforamtion のタグ情報を削除してから
-         * TagInforamtion のタグ情報を削除する
+         * 担当タスクのタグ情報削除 TaskInforamtion のタグ情報を削除してから TagInforamtion のタグ情報を削除する
          * そうしないとエラーが出て削除できない
          */
         for (TaskInformation t : taskList) {
@@ -228,7 +226,7 @@ public class Admin extends Controller {
                 t.save();
             }
         }
-        for(TagInformation tag : tagList) {
+        for (TagInformation tag : tagList) {
             // 削除するユーザのタスクから削除する
             if (tag.task.assign_user == user) {
                 tag.delete();
@@ -240,7 +238,7 @@ public class Admin extends Controller {
                 t.delete();
             }
         }
-        
+
         // 成功表示
         flash.put("success", "利用者[" + user_id + "]を削除しました");
 

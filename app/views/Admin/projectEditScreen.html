@@ -9,9 +9,11 @@
                 <h4 class="modal-title">本当に削除しますか？</h4>
             </div>
             <div class="modal-footer">
-                #{list items:userList, as:'user'}
-                <form action='/Admin/userDelete?project_name=${project.project_name}&user_id=${user.user_id}' method='POST'>
-                    #{/list}
+
+                <form action='/Admin/userDelete' method='POST'>
+                    <div id="user_remove_form">
+
+                    </div>
                     <input type="submit" class="btn btn-default" value="はい">
                     <input type="button" class="btn btn-default" data-dismiss="modal" value="いいえ">
                 </form>
@@ -44,31 +46,6 @@
     </tbody>
 </table>
 
-<!--
-      </tr>
-  </thead>
-  <tbody>
-      #{list items:プロジェクト一覧, as:'project'}
-      <tr>
-          <td>${project.id}</td>
-          <td>${project.project_name}
-          </td>
-          <td>${project.task_list.size()}</td>
-          <td>${project.project_member.size()}
-          </td>
-          <td>
-              <a href="/Admin/プロジェクト削除処理?project_name=${project.project_name}">
-                  <button type="button">削除</button>
-              </a>
-
-          </td>
-      </tr>
-      #{/list}
-  </tbody>
-</table>
-
--->
-
 <br/>
 
 <div id="利用者追加フォーム" style="text-align:center;">
@@ -79,25 +56,32 @@
     </form>
 </div> 
 
-<!--
-
-<div id="タスク作成フォーム" style="text-align: center;">
-    <form action='/TaskManager/taskCreate' method='POST'> 
-        <td><input type='hidden' name='project_name' value='${project_name}' /> </td>
-        <td><input type='text' name='task_name' value='' placeholder="タスク名" /></td>
-        <td></td>
-        <td><input type="text" class="datepicker" name="deadline" placeholder="締め切り" /></td>
-        <td></td>
-        <td><input type="submit" value="タスク作成" /></td>
-        <td></td>
-    </form>
-</div>
-
--->
-
 <script type="text/javascript">
+    // チェック用変数
+    var check = false;
+
     $(function() {
         $(".user_remove").on("click", function() {
+            var user_id = $(this).parent().parent().find("td:first").text();
+            console.log(user_id);
+            
+            /**
+             *  削除確認時に いいえ を押して
+             *  更新等挟まずにもう一度削除しようとすると
+             *  前のデータが残って、エラーが出たり、違うユーザが削除されてしまう
+             *  その防止のため、２回目以降のモーダル表示時には appennd したもの全部削除してから
+             *  あらためて追加する。
+             */
+            if (check) {
+                $("#user_remove_form").empty();
+            }                                    
+            // プロジェクトネーム input
+            $("#user_remove_form").append("<input type='hidden' name='project_name' value='${project.project_name}' />");
+            // ユーザID input
+            $("#user_remove_form").append("<input type='hidden' name='user_id' value='" + user_id + "' /> ");
+            // 次回モーダル表示時に子要素削除を TRUE
+            check=true;
+
             $("#user_remove_modal").modal('show')
         });
     });
