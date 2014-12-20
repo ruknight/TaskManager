@@ -71,7 +71,7 @@ public class Auth extends Secure.Security {
         
         if(user.is_admin){
             // 管理者なら管理者用TOP画面
-            Admin.管理者用TOP画面();
+            Admin.adminScreen();
         } else {
             // 管理者でなければ，プロジェクト一覧画面
             TaskManager.projectListScreen();

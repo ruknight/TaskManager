@@ -53,7 +53,11 @@
 	      <div class="modal-body">
 	        <input type='hidden' name='project_name' value='${project_name}' /> 
 	        <div id="add_task_id"></div>
+<<<<<<< HEAD
 			<input type="text" class="tag" name="tag_name" placeholder="タグ名" />
+=======
+			<input type="text" class="tagAdd" name="tag_name" placeholder="タグ名" />
+>>>>>>> eelight
 			<p id="tag_validation" class="hide warning">タグ名を入力してください</p>      
 	      </div>
 	      <div class="modal-footer">
@@ -171,11 +175,19 @@ $("#edit_task").submit(function(){
 $(".tag").on("click", function(){
 	var task_id = $(this).parent().parent().find("td:first").text();
 	console.log(task_id);
+<<<<<<< HEAD
 	$("#add_task_id").append("<input type='hidden' name='id_of_task' value='" + task_id + "' /> ");
 	$("#tag_modal").modal('show')
 });
 $("#create_tag").submit(function(){
 	var task = $(".tag").val();
+=======
+	$("#add_task_id").prepend("<input type='hidden' name='id_of_task' value='" + task_id + "' /> ");
+	$("#tag_modal").modal('show')
+});
+$("#create_tag").submit(function(){
+	var task = $(".tagAdd").val();
+>>>>>>> eelight
 	console.log(task);
 	if(task == ""){
 		$("#tag_validation").removeClass("hide");
