@@ -65,9 +65,17 @@ public class TaskManager extends Controller {
 
 		// ログインしているユーザーのユーザー情報を取得する
 		UserInformation user = Auth.get_login_user();
+                
+	
+		//　パスワードが以前と同じならもう一度
+		if (user.password.equals(UserInformation.get_password_hash(password1))){
+			flash.put("error", "パスワードが変わっていません");
+			passwordChangeScreen();
+		}
+		                
 
 		// パスワードを暗号化して，上書き
-		user.password = UserInformation.get_password_hash(password1);
+		user.password = UserInformation.get_password_hash(password1);                              
 
 		// 初回ログインフラグをfalseにする
 		user.is_first_login = false;
